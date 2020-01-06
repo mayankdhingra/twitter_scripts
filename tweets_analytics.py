@@ -2,11 +2,8 @@ import tweepy as tw
 import datetime
 from datetime import timedelta
 
-#auth = tw.OAuthHandler('consumer_key','consumer_secret') #insert consumer_key and consumer_secret
-#auth.set_access_token('access_token','access_token_secret') #insert access_token and access_token_secret
-
-auth = tw.OAuthHandler('RNBjxhFByfCbeBE0Ew3aWYBKA','wNjQiWyxV09wD7GxqiE3lD51kVb4pkBEuB5X4jNaCJFvHz9jTq') #insert consumer_key and consumer_secret
-auth.set_access_token('7815702-FNyRNz2MJSFNzSTkZsy3GvLgdIO1kNXpLvt83jER7S','mKRGCvBDG2ry8wXfInAbeouSNycFcqSEpBh07UiWiw58T') #insert access_token and access_token_secret
+auth = tw.OAuthHandler('consumer_key','consumer_secret') #insert consumer_key and consumer_secret
+auth.set_access_token('access_token','access_token_secret') #insert access_token and access_token_secret
 
 api = tw.API(auth, wait_on_rate_limit=True)
 total_retweet_count=0
@@ -42,7 +39,8 @@ else:
 	for tweet in tmpTweets:
 		if tweet.created_at+timedelta(hours=5.5) < endDate and tweet.created_at+timedelta(hours=5.5) > startDate:
 			tweets.append(tweet)
-
+			hours.append((tweet.created_at+timedelta(hours=5.5)).hour)
+	
 	#while (tmpTweets[-1].created_at+timedelta(hours=5.5) > startDate):
 	while (tmpTweets[-1].created_at > startDate):
 		tmpTweets = api.user_timeline(username,max_id=tmpTweets[-1].id)
@@ -51,8 +49,8 @@ else:
 			if tweet.created_at+timedelta(hours=5.5) < endDate and tweet.created_at+timedelta(hours=5.5) > startDate and tweet not in tweets:
 			#if tweet.created_at < endDate and tweet.created_at > startDate and tweet not in tweets:
 				tweets.append(tweet)
+				hours.append((tweet.created_at+timedelta(hours=5.5)).hour)
 				#print(tweets)
-
 	for t in tweets:
 		if t.in_reply_to_status_id is not None:
 			reply_to_others+=1
@@ -72,9 +70,12 @@ else:
 	orignal_tweets=len(tweets)-rt_of_others
 	new_tweets=	len(tweets)-rt_of_others-reply_to_others
 	print("Tweet Analysis \n-----------")
+	#print(hours)
 	print(username+ " has Tweeted " + str(len(tweets)) + " times over " + str(duration) + " days")
 	if len(tweets)>0:
 		print(f"Average Tweets Per Day: {round((len(tweets)/duration),2)}")
+		print(username+"'s Peak Hour for Tweeting is between "+str(max(hours,key=hours.count)) + " and " + str(max(hours,key=hours.count)+1) +" Hours")
+		#print(username+"'s Lean Hour for Tweeting is between "+str(min(hours,key=hours.count)) + " and " + str(min(hours,key=hours.count)+1) +" Hours")
 		print(f"New Tweets:  {len(tweets)-rt_of_others-reply_to_others}, Replies to Others: {reply_to_others}, Retweets of Others: {rt_of_others}")
 		print(username+"'s original tweet ratio (new tweets + replies to others): " + str(round(orignal_tweets*100/len(tweets),2)) + "%")
 		print(username+"'s new tweet ratio (excl replies to others and RTs): " + str(round(new_tweets*100/len(tweets),2)) + "%")
