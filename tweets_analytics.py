@@ -2,8 +2,11 @@ import tweepy as tw
 import datetime
 from datetime import timedelta
 
-auth = tw.OAuthHandler('consumer_key','consumer_secret') #insert consumer_key and consumer_secret
-auth.set_access_token('access_token','access_token_secret') #insert access_token and access_token_secret
+#auth = tw.OAuthHandler('consumer_key','consumer_secret') #insert consumer_key and consumer_secret
+#auth.set_access_token('access_token','access_token_secret') #insert access_token and access_token_secret
+
+auth = tw.OAuthHandler('RNBjxhFByfCbeBE0Ew3aWYBKA','wNjQiWyxV09wD7GxqiE3lD51kVb4pkBEuB5X4jNaCJFvHz9jTq') #insert consumer_key and consumer_secret
+auth.set_access_token('7815702-FNyRNz2MJSFNzSTkZsy3GvLgdIO1kNXpLvt83jER7S','mKRGCvBDG2ry8wXfInAbeouSNycFcqSEpBh07UiWiw58T') #insert access_token and access_token_secret
 
 api = tw.API(auth, wait_on_rate_limit=True)
 total_retweet_count=0
@@ -15,6 +18,7 @@ rt_of_others=0
 reply_to_others=0
 original_tweets=0
 new_tweets=0
+hours=[]
 try:
 	start_date_entry = input('Enter a start date in DD-MM-YYYY format: ')
 	end_date_entry   = input('Enter an end date in DD-MM-YYYY format: ')
@@ -72,11 +76,12 @@ else:
 	if len(tweets)>0:
 		print(f"Average Tweets Per Day: {round((len(tweets)/duration),2)}")
 		print(f"New Tweets:  {len(tweets)-rt_of_others-reply_to_others}, Replies to Others: {reply_to_others}, Retweets of Others: {rt_of_others}")
-		print(username+"'s original tweet ratio (new tweets + replies to others) is " + str(round(orignal_tweets*100/len(tweets),2)) + "%")
-		print(username+"'s new tweet ratio (excl replies to others and RTs) is " + str(round(new_tweets*100/len(tweets),2)) + "%")
+		print(username+"'s original tweet ratio (new tweets + replies to others): " + str(round(orignal_tweets*100/len(tweets),2)) + "%")
+		print(username+"'s new tweet ratio (excl replies to others and RTs): " + str(round(new_tweets*100/len(tweets),2)) + "%")
 		print(f"{len(tweets)-rt_of_others-reply_to_others} New Tweets got {total_likes_count} Likes and {total_retweet_count} Retweets")
-		print(f"% Tweets with Engagement: {round((new_tweets-tweets_with_noengagement)*100/new_tweets,2)} %" )
-		print(f"Average Engagement Per Tweet: {round(total_likes_count/len(tweets),2)} Likes Per Tweet, {round(total_retweet_count/len(tweets),2)} Retweets Per Tweet,")
+		if new_tweets>0:
+			print(f"% Tweets with Engagement: {round((new_tweets-tweets_with_noengagement)*100/new_tweets,2)} %" )
+		print(f"Average Engagement Per Tweet: {round(total_likes_count/len(tweets),2)} Likes Per Tweet, {round(total_retweet_count/len(tweets),2)} Retweets Per Tweet")
 		print("-----------")
 	
 
