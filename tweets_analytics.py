@@ -1,9 +1,10 @@
 import tweepy as tw
-import datetime
+import datetime,statistics
 from datetime import timedelta
 
 auth = tw.OAuthHandler('consumer_key','consumer_secret') #insert consumer_key and consumer_secret
 auth.set_access_token('access_token','access_token_secret') #insert access_token and access_token_secret
+
 
 api = tw.API(auth, wait_on_rate_limit=True)
 total_retweet_count=0
@@ -16,6 +17,7 @@ reply_to_others=0
 original_tweets=0
 new_tweets=0
 hours=[]
+tweet_length=[]
 try:
 	start_date_entry = input('Enter a start date in DD-MM-YYYY format: ')
 	end_date_entry   = input('Enter an end date in DD-MM-YYYY format: ')
@@ -40,6 +42,7 @@ else:
 		if tweet.created_at+timedelta(hours=5.5) < endDate and tweet.created_at+timedelta(hours=5.5) > startDate:
 			tweets.append(tweet)
 			hours.append((tweet.created_at+timedelta(hours=5.5)).hour)
+			tweet_length.append(len(tweet.text))
 	
 	#while (tmpTweets[-1].created_at+timedelta(hours=5.5) > startDate):
 	while (tmpTweets[-1].created_at > startDate):
@@ -50,6 +53,7 @@ else:
 			#if tweet.created_at < endDate and tweet.created_at > startDate and tweet not in tweets:
 				tweets.append(tweet)
 				hours.append((tweet.created_at+timedelta(hours=5.5)).hour)
+				tweet_length.append(len(tweet.text))
 				#print(tweets)
 	for t in tweets:
 		if t.in_reply_to_status_id is not None:
@@ -75,6 +79,7 @@ else:
 	if len(tweets)>0:
 		print(f"Average Tweets Per Day: {round((len(tweets)/duration),2)}")
 		print(username+"'s Peak Hour for Tweeting is between "+str(max(hours,key=hours.count)) + " and " + str(max(hours,key=hours.count)+1) +" Hours")
+		print(username+"'s Average Tweet is " +str(round(statistics.mean(tweet_length)))+" characters long")
 		#print(username+"'s Lean Hour for Tweeting is between "+str(min(hours,key=hours.count)) + " and " + str(min(hours,key=hours.count)+1) +" Hours")
 		print(f"New Tweets:  {len(tweets)-rt_of_others-reply_to_others}, Replies to Others: {reply_to_others}, Retweets of Others: {rt_of_others}")
 		print(username+"'s original tweet ratio (new tweets + replies to others): " + str(round(orignal_tweets*100/len(tweets),2)) + "%")
