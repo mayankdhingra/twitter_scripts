@@ -7,43 +7,35 @@ auth.set_access_token('access_token','access_token_secret') #insert access_token
 
 
 api = tw.API(auth, wait_on_rate_limit=True)
-total_retweet_count=0
-tweets_with_noengagement=0
-total_likes_count=0
-username = input("Enter a Twitter Username: ")
-tweets=[]
-rt_of_others=0
-reply_to_others=0
-original_tweets=0
-new_tweets=0
-hours=[]
-tweet_length=[]
-try:
-	start_date_entry = input('Enter a start date in DD-MM-YYYY format: ')
-	end_date_entry   = input('Enter an end date in DD-MM-YYYY format: ')
-	day, month, year = map(int,start_date_entry.split('-'))
-	startDate = datetime.datetime(year,month,day,0,0,0)
-	day, month, year = map(int,end_date_entry.split('-'))
-	endDate = datetime.datetime(year,month,day,23,59,59)
-	duration = ((endDate-startDate).days)+1
-except:
-	print("Please check start and end dates")
 
-if duration<=0:
-	print("Please check start and end dates you entered")
-else:
-	
+
+username = input("Enter a Twitter Username: ")
+
+def do_tweets_analysis(username,startDate,endDate):
+
+	total_retweet_count=0
+	tweets_with_noengagement=0
+	total_likes_count=0
+	tweets=[]
+	hours=[]
+	tweet_length=[]
+	orignal_tweets=0
+	new_tweets=0
+	rt_of_others=0
+	reply_to_others=0
+
+
 	try:
 		tmpTweets = api.user_timeline(username)
 	except:
-		print("Please check the username you entered")	
+		print("Please check the username you entered")
 
 	for tweet in tmpTweets:
 		if tweet.created_at+timedelta(hours=5.5) < endDate and tweet.created_at+timedelta(hours=5.5) > startDate:
 			tweets.append(tweet)
 			hours.append((tweet.created_at+timedelta(hours=5.5)).hour)
 			tweet_length.append(len(tweet.text))
-	
+		
 	#while (tmpTweets[-1].created_at+timedelta(hours=5.5) > startDate):
 	while (tmpTweets[-1].created_at > startDate):
 		tmpTweets = api.user_timeline(username,max_id=tmpTweets[-1].id)
@@ -73,6 +65,35 @@ else:
 
 	orignal_tweets=len(tweets)-rt_of_others
 	new_tweets=	len(tweets)-rt_of_others-reply_to_others
+
+	#return {'tweets':tweets,'hours':hours,tweet_length:tweet_length,rt_of_others:rt_of_others,reply_to_others:reply_to_others,orignal_tweets:orignal_tweets,new_tweets:new_tweets,total_likes_count:total_likes_count,total_retweet_count:total_retweet_count,tweets_with_noengagement:tweets_with_noengagement]
+	return {'tweets':tweets,'hours':hours,'tweet_length':tweet_length,'rt_of_others':rt_of_others,'reply_to_others':reply_to_others,'orignal_tweets':orignal_tweets,'new_tweets':new_tweets,'total_likes_count':total_likes_count,'total_retweet_count':total_retweet_count,'tweets_with_noengagement':tweets_with_noengagement}
+try:
+	start_date_entry = input('Enter a start date in DD-MM-YYYY format: ')
+	end_date_entry   = input('Enter an end date in DD-MM-YYYY format: ')
+	day, month, year = map(int,start_date_entry.split('-'))
+	startDate = datetime.datetime(year,month,day,0,0,0)
+	day, month, year = map(int,end_date_entry.split('-'))
+	endDate = datetime.datetime(year,month,day,23,59,59)
+	duration = ((endDate-startDate).days)+1
+except:
+	print("Please check start and end dates")
+
+if duration<=0:
+	print("Please check start and end dates you entered")
+else:	
+	dict = do_tweets_analysis(username,startDate,endDate)	
+	#too lazy to change variables used in print functions
+	tweets = dict['tweets']
+	hours = dict['hours']
+	tweet_length = dict['tweet_length']
+	rt_of_others = dict['rt_of_others']
+	reply_to_others = dict['reply_to_others']
+	orignal_tweets = dict['orignal_tweets']
+	new_tweets = dict['new_tweets']
+	total_likes_count = dict['total_likes_count']
+	total_retweet_count = dict['total_retweet_count']
+	tweets_with_noengagement = dict['tweets_with_noengagement']
 	print("Tweet Analysis \n-----------")
 	#print(hours)
 	print(username+ " has Tweeted " + str(len(tweets)) + " times over " + str(duration) + " days")
