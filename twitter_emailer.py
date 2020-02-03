@@ -33,7 +33,7 @@ def collect_tweets(users):
         startDate=endDate=datetime.now().date()+timedelta(days=-1)
     
         try:
-            tmpTweets = api.user_timeline(username)
+            #tmpTweets = api.user_timeline(username)
             for status in tw.Cursor(api.user_timeline, id=username, tweet_mode='extended').items():
                 if status.created_at.date()+timedelta(hours=5.5) == datetime.now().date()+timedelta(days=-1):
                     if status.in_reply_to_screen_name==username or status.in_reply_to_status_id is None:
@@ -42,11 +42,13 @@ def collect_tweets(users):
             #print(len(results),"aaaaaa")
         except:
             print("Please check the username you entered")
+
     return yesterdays_tweets
 
 
 def email_tweets(username,yesterdays_tweets):
     if yesterdays_tweets:
+
         sender_email = "a@gmail.com"  # Enter your address
         receiver_email = "d@gmail.com"  # Enter receiver address
         tweet_number=1
@@ -56,7 +58,7 @@ def email_tweets(username,yesterdays_tweets):
         SUBJECT = "Yesterday's Tweets Summary For:" + username
         TEXT = "\n"
         
-        for tw in yesterdays_tweets:
+        for tw in list(reversed(yesterdays_tweets)):
             tw = tw.encode('ascii', 'ignore').decode('ascii')
             TEXT = TEXT + """Tweet """ +str(tweet_number) + ": "+ str(tw) + " \n"
             tweet_number+=1
