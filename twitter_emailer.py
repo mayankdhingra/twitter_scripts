@@ -18,10 +18,10 @@ def collect_tweets(users):
     yesterdays_tweets_details={} # {u1:{id1:[type1,text1,link1],id2:[type2,text2,link2]},u2:{id1:[type1,text1,link1],id2:[type2,text2,link2]}}
     
     def get_status_text(status_id): 
-        
+        # s.entities['media'][0]['media_url'] media url
         status=api.get_status(status_id, tweet_mode='extended')
         if hasattr(status,'retweeted_status'):
-            text = status._json['retweeted_status']['full_text']
+            text = "RT @" + str(status._json['retweeted_status']['user']['screen_name']) + ": " + str(status._json['retweeted_status']['full_text'])            
         else:
             if hasattr(status,'extended_status'):
                 text = status.extended_tweet['full_text']
@@ -61,13 +61,11 @@ def collect_tweets(users):
                         #    users_yday_tweets[status.id]=[get_status_text(status.id),'']
     
             yesterdays_tweets_details[username]=users_yday_tweets
+            #yesterdays_tweets_details[username]=dict(sorted(users_yday_tweets.items(), key=operator.itemgetter(1)))
 
         except:
             print("Please check the username you entered")
     
-    #yesterdays_tweets_details[username]=users_yday_tweets
-    #print(yesterdays_tweets_details,2)
-    #print(yesterdays_tweets_details)
     return yesterdays_tweets_details
 
 
@@ -89,25 +87,27 @@ def email_tweets(users,yesterdays_tweets):
 
         #Subject: Yesterday's Tweets Summary: """ + str(username) + """ """ +str(len(yesterdays_tweets)) + """
         
-        SUBJECT = "Yesterday's Tweets Summary For:" + "{} and {}".format(", ".join(users[:-1]),  users[-1])
+        SUBJECT = "Yesterday's Tweets Summary For: " + "{} and {}".format(", ".join(users[:-1]),  users[-1])
         TEXT = "\n"
         
         for user in users:
             tweets=yesterdays_tweets[user]
-            TEXT = TEXT + "Tweets By " + user + "\n\n"
-            for tw in tweets:
-                #tw = tw.encode('ascii', 'ignore').decode('ascii')
-                txt = tweets[tw][0]
-                TEXT = TEXT + """Tweet """ +str(tweet_number) + ": "+ str(txt) +  " \n"
-                tweet_number+=1
+            if tweets:
+                TEXT = TEXT + "Tweets By " + user + "\n\n"
+                for tw in tweets:
+                    txt = tweets[tw][0]
+                    TEXT = TEXT + """Tweet """ +str(tweet_number) + ": "+ str(txt) +  " \n"
+                    tweet_number+=1
+                TEXT= TEXT + "\n\n"
+            else:
+                TEXT = TEXT + "No Tweets By " + user + "yesterday"
         
-        TEXT+= "\n"
-        #print(TEXT)
 
         message = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
-
+        print(message)
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.login("email id", "password") #email id and password
+        message= message.encode('ascii', 'ignore').decode('ascii')
         server.sendmail(sender_email,receiver_email,message)
         print("Email Sent")
         server.quit()
