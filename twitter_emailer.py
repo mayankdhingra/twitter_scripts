@@ -2,15 +2,16 @@ import tweepy as tw
 import smtplib
 from email.message import EmailMessage
 from datetime import datetime,date,timedelta
+from collections import OrderedDict
 
 auth = tw.OAuthHandler('consumer_key','consumer_secret') #insert consumer_key and consumer_secret
 auth.set_access_token('access_token','access_token_secret') #insert access_token and access_token_secret
-
 
 api = tw.API(auth, wait_on_rate_limit=True)
 
 user_name = input("Enter Twitter Usernames (seperated by comma) you'd like to get tweets in email for: ")
 users = user_name.split(',')
+
 
 
 def collect_tweets(users):
@@ -39,7 +40,8 @@ def collect_tweets(users):
 
     for username in users:
         
-        users_yday_tweets={}
+        users_yday_tweets = OrderedDict() 
+        #users_yday_tweets={}
         count=0
         startDate=endDate=datetime.now().date()+timedelta(days=-1)
         
@@ -59,8 +61,11 @@ def collect_tweets(users):
                         users_yday_tweets[status.id]=[get_status_text(status.id)]
                         #else:
                         #    users_yday_tweets[status.id]=[get_status_text(status.id),'']
-    
-            yesterdays_tweets_details[username]=users_yday_tweets
+
+            users_yday_tweets_reversed = OrderedDict()
+            for k in reversed(users_yday_tweets):
+                users_yday_tweets_reversed[k] = users_yday_tweets[k]
+            yesterdays_tweets_details[username]=users_yday_tweets_reversed
             #yesterdays_tweets_details[username]=dict(sorted(users_yday_tweets.items(), key=operator.itemgetter(1)))
 
         except:
