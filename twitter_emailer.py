@@ -12,8 +12,6 @@ api = tw.API(auth, wait_on_rate_limit=True)
 user_name = input("Enter Twitter Usernames (seperated by comma) you'd like to get tweets in email for: ")
 users = user_name.split(',')
 
-
-
 def collect_tweets(users):
     yesterdays_tweets = []
     yesterdays_tweets_details={} # {u1:{id1:[type1,text1,link1],id2:[type2,text2,link2]},u2:{id1:[type1,text1,link1],id2:[type2,text2,link2]}}
@@ -31,17 +29,17 @@ def collect_tweets(users):
         
         return text
 
-    def get_status_url(status_id):
-        print(status_id)
-        status=api.get_status(status_id, include_entities=True)
-        print(status.entities['urls'][0]['expanded_url'])
-        status_url=status.entities['urls'][0]['expanded_url']  
+    def get_status_url(username,status_id):
+    
+        status=api.get_status(status_id, include_entities=True)    
+        status_url="https://twitter.com/"+str(username)+"/status/"+str(status_id)
+        #print(status.entities['urls'][0]['expanded_url'])
+        #status_url=status.entities['urls'][0]['expanded_url']  
         return status_url
 
     for username in users:
         
         users_yday_tweets = OrderedDict() 
-        #users_yday_tweets={}
         count=0
         startDate=endDate=datetime.now().date()+timedelta(days=-1)
         
@@ -57,8 +55,8 @@ def collect_tweets(users):
                         #print(status.entities['urls'])
                         #if status.entities['urls']:
                         #    print(get_status_url(status.id))
-                        #users_yday_tweets[status.id]=[get_status_text(status.id),get_status_url(status.id)]
-                        users_yday_tweets[status.id]=[get_status_text(status.id)]
+                        users_yday_tweets[status.id]=[get_status_text(status.id),get_status_url(username,status.id)]
+                        #users_yday_tweets[status.id]=[get_status_text(status.id)]
                         #else:
                         #    users_yday_tweets[status.id]=[get_status_text(status.id),'']
 
@@ -66,6 +64,7 @@ def collect_tweets(users):
             for k in reversed(users_yday_tweets):
                 users_yday_tweets_reversed[k] = users_yday_tweets[k]
             yesterdays_tweets_details[username]=users_yday_tweets_reversed
+            #print(yesterdays_tweets_details)
             #yesterdays_tweets_details[username]=dict(sorted(users_yday_tweets.items(), key=operator.itemgetter(1)))
 
         except:
@@ -101,15 +100,16 @@ def email_tweets(users,yesterdays_tweets):
                 TEXT = TEXT + "Tweets By " + user + "\n\n"
                 for tw in tweets:
                     txt = tweets[tw][0]
-                    TEXT = TEXT + """Tweet """ +str(tweet_number) + ": "+ str(txt) +  " \n"
+                    url= tweets[tw][1]
+                    TEXT = TEXT + """Tweet """ +str(tweet_number) + ": "+ str(txt) +  " \nTweet Link: " +  str(url) +"\n"
                     tweet_number+=1
                 TEXT= TEXT + "\n\n"
             else:
-                TEXT = TEXT + "No Tweets By " + user + "yesterday"
+                TEXT = TEXT + "No Tweets By " + user + " yesterday"
         
 
         message = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
-        print(message)
+        #print(message)
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
         server.login("email id", "password") #email id and password
         message= message.encode('ascii', 'ignore').decode('ascii')
