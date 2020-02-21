@@ -4,13 +4,18 @@ from email.message import EmailMessage
 from datetime import datetime,date,timedelta
 from collections import OrderedDict
 
-auth = tw.OAuthHandler('consumer_key','consumer_secret') #insert consumer_key and consumer_secret
-auth.set_access_token('access_token','access_token_secret') #insert access_token and access_token_secret
+#auth = tw.OAuthHandler('consumer_key','consumer_secret') #insert consumer_key and consumer_secret
+#auth.set_access_token('access_token','access_token_secret') #insert access_token and access_token_secret
+
+auth = tw.OAuthHandler('5q2zSNHBAvVAsTfIe7Nslp9yd','XH9T5kbucyHIFU8Yu5t2mHjms24xFdFi2D3xupRwO2ClSuKC4r') #insert consumer_key and consumer_secret
+auth.set_access_token('7815702-I0Dl8saHX889I7kONe1vOu133d2HhzVOWe2mnqljW1','3tupe3tYnQNfFqbOs0Lt0G70g41HE3fILPhE05hPRP93H') #insert access_token and access_token_secret
 
 api = tw.API(auth, wait_on_rate_limit=True)
 
-user_name = input("Enter Twitter Usernames (seperated by comma) you'd like to get tweets in email for: ")
-users = user_name.split(',')
+#user_name = input("Enter Twitter Usernames (seperated by comma) you'd like to get tweets in email for: ")
+#users = user_name.split(',')
+
+users = ['intentionally','manas_saloi']
 
 def collect_tweets(users):
     yesterdays_tweets = []
@@ -80,11 +85,14 @@ def email_tweets(users,yesterdays_tweets):
     #for tw in yesterdays_tweets:   
         #yesterdays_tweets_details[tw]=get_status_text(tw)
         #yesterdays_tweets_text.append(get_status_text(t))
+    
+    #start = "\033[1m"
+    #end = "\033[0;0m"
 
     if yesterdays_tweets:
 
-        sender_email = "a@gmail.com"  # Enter your address
-        receiver_email = "d@gmail.com"  # Enter receiver address
+        sender_email = "anemos.solutions@gmail.com"  # Enter your address
+        receiver_email = "dhingra.mayank@gmail.com"  # Enter receiver address
 
         #Subject: Yesterday's Tweets Summary: """ + str(username) + """ """ +str(len(yesterdays_tweets)) + """
         
@@ -94,7 +102,8 @@ def email_tweets(users,yesterdays_tweets):
         for user in users:
             tweets=yesterdays_tweets[user]
             if tweets:
-                TEXT = TEXT + "\033[1m" + "Tweets By " + user +  "\033[0m" + "\n\n"
+                #TEXT = TEXT + start + "Tweets By " + user +  end + "\n\n"
+                TEXT = TEXT  + "Tweets By " + user  + "\n\n"
                 no_of_tweets = len(tweets)
                 tweet_number=1
                 for tw in tweets:
@@ -108,9 +117,10 @@ def email_tweets(users,yesterdays_tweets):
         
 
         message = 'Subject: {}\n\n{}'.format(SUBJECT, TEXT)
-        #print(message)
+        print(message)
         server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
-        server.login("email id", "password") #email id and password
+        #server.login("email id", "password") #email id and password
+        server.login("anemos.solutions@gmail.com", "aforanemos123") #email id and password
         message= message.encode('ascii', 'ignore').decode('ascii')
         server.sendmail(sender_email,receiver_email,message)
         print("Email Sent")
