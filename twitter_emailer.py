@@ -77,8 +77,6 @@ def email_tweets(users,yesterdays_tweets):
     #yesterdays_tweets_text=[]
     
     #yesterdays_tweets_text=yesterdays_tweets[username]
-    
-
     #for tw in yesterdays_tweets:   
         #yesterdays_tweets_details[tw]=get_status_text(tw)
         #yesterdays_tweets_text.append(get_status_text(t))
@@ -87,7 +85,6 @@ def email_tweets(users,yesterdays_tweets):
 
         sender_email = "a@gmail.com"  # Enter your address
         receiver_email = "d@gmail.com"  # Enter receiver address
-        tweet_number=1
 
         #Subject: Yesterday's Tweets Summary: """ + str(username) + """ """ +str(len(yesterdays_tweets)) + """
         
@@ -97,11 +94,13 @@ def email_tweets(users,yesterdays_tweets):
         for user in users:
             tweets=yesterdays_tweets[user]
             if tweets:
-                TEXT = TEXT + "Tweets By " + user + "\n\n"
+                TEXT = TEXT + "\033[1m" + "Tweets By " + user +  "\033[0m" + "\n\n"
+                no_of_tweets = len(tweets)
+                tweet_number=1
                 for tw in tweets:
                     txt = tweets[tw][0]
                     url= tweets[tw][1]
-                    TEXT = TEXT + """Tweet """ +str(tweet_number) + ": "+ str(txt) +  " \nTweet Link: " +  str(url) +"\n"
+                    TEXT = TEXT + """Tweet """ +str(tweet_number) + ": "+ str(txt) +  " \nTweet Link: " +  str(url) +"\n\n"
                     tweet_number+=1
                 TEXT= TEXT + "\n\n"
             else:
