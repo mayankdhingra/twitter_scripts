@@ -16,8 +16,8 @@ thread_end_date = datetime.datetime(thread_start_date.year,thread_start_date.mon
 username=thread_url.split('/status/')[0].split('/')[3]
 #status=api.get_status(thread_start_id, tweet_mode='extended')
 #print("user",username,"id",thread_start_id,"start date",thread_start_status.created_at,"end date",thread_end_date)
-tweets_longlist = []
-tweets_shortlist = []
+#print(thread_start_status.created_at.date())
+tweets_longlist,tweets_shortlist = [],[]
 tweets_shortlist.append(thread_start_status)
 
 try:
