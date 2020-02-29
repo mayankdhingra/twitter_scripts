@@ -12,7 +12,12 @@ thread_url=input("Please enter the tweetstorm you want to download: ")
 thread_start_id=thread_url.split('/status/')[1]
 thread_start_status=api.get_status(thread_start_id,tweet_mode='extended')
 thread_start_date=thread_start_status.created_at
-thread_end_date = datetime.datetime(thread_start_date.year,thread_start_date.month,thread_start_date.day+2,23,59,59) #assumption - almost all people will tweet a tweestorm over three days
+if thread_start_date.day>26: #assumption - almost all people will tweet a tweestorm over three days           
+    thread_end_date = datetime.datetime(thread_start_date.year,thread_start_date.month+1,1,23,59,59) 
+else:   
+    thread_end_date = datetime.datetime(thread_start_date.year,thread_start_date.month,thread_start_date.day+1,23,59,59) #assumption - almost all people will tweet a tweestorm over three days
+
+#thread_end_date = datetime.datetime(thread_start_date.year,thread_start_date.month,thread_start_date.day+2,23,59,59) #assumption - almost all people will tweet a tweestorm over three days
 username=thread_url.split('/status/')[0].split('/')[3]
 #status=api.get_status(thread_start_id, tweet_mode='extended')
 #print("user",username,"id",thread_start_id,"start date",thread_start_status.created_at,"end date",thread_end_date)
