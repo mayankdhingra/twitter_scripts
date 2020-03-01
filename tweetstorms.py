@@ -31,9 +31,10 @@ except:
 	print("Please check the username you entered")		
 
 for tweet in tmpTweets:
-    if tweet.created_at < thread_end_date and tweet.created_at > thread_start_date:
+    if tweet.created_at < thread_end_date and tweet.created_at >= thread_start_date:
+        #print(tweet.full_text)
         tweets_longlist.append(tweet)
-
+#print("\n",thread_start_date,thread_end_date,tmpTweets[-1].created_at,len(tweets_longlist))
 while (tmpTweets[-1].created_at > thread_start_date):
     tmpTweets = api.user_timeline(username,max_id=tmpTweets[-1].id,tweet_mode='extended')
     for tweet in tmpTweets:
@@ -44,13 +45,14 @@ tweets_longlist = tweets_longlist[::-1]
 previous_tweet_id=int(thread_start_id)
 
 for tweet in tweets_longlist:
+    #print(tweet._json['id'],tweet._json['in_reply_to_status_id'],previous_tweet_id)
     #print("here",tweet._json['in_reply_to_status_id'],previous_tweet_id,tweet._json['in_reply_to_status_id']==previous_tweet_id)
     if tweet._json['in_reply_to_status_id']==previous_tweet_id:
         #print("here1")
         tweets_shortlist.append(tweet)
         previous_tweet_id=tweet._json['id']
 
-print(f"Tweetstorm by @{username} comprising of {len(tweets_shortlist)} tweets\n")
+print(f"Tweetstorm by @{username} comprising of {len(tweets_shortlist)} tweets, URL: {thread_url}\n")
 print("-------------------------------------------------------------------------------------------------------------------------------------")
 for tweet in tweets_shortlist:    
     print(tweet.full_text,"\n")
