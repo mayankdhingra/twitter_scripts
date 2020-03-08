@@ -7,7 +7,6 @@ auth.set_access_token('access_token','access_token_secret') #insert access_token
 
 api = tw.API(auth, wait_on_rate_limit=True)
 
-
 thread_url=input("Please enter the tweetstorm you want to download: ")
 thread_start_id=thread_url.split('/status/')[1]
 thread_start_status=api.get_status(thread_start_id,tweet_mode='extended')
@@ -24,9 +23,9 @@ username=thread_url.split('/status/')[0].split('/')[3]
 #print(thread_start_status.created_at.date())
 tweets_longlist,tweets_shortlist = [],[]
 tweets_shortlist.append(thread_start_status)
-
+#print(tweets_shortlist)
 try:
-	tmpTweets = api.user_timeline(username,tweet_mode='extended')
+	tmpTweets = api.user_timeline(username,tweet_mode='extended',include_entities=True)
 except:
 	print("Please check the username you entered")		
 
@@ -55,5 +54,9 @@ for tweet in tweets_longlist:
 print(f"Tweetstorm by @{username} comprising of {len(tweets_shortlist)} tweets, URL: {thread_url}\n")
 print("-------------------------------------------------------------------------------------------------------------------------------------")
 for tweet in tweets_shortlist:    
-    print(tweet.full_text,"\n")
+    print(tweet.full_text)
+    if 'media' in tweet.entities: #print urls for images from the tweets
+        for media in tweet.extended_entities['media']:
+            print(media['media_url'])
+    print("\n")
 print("-------------------------------------------------------------------------------------------------------------------------------------")
