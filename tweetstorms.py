@@ -1,11 +1,17 @@
 import tweepy as tw 
-import datetime
+import datetime,requests,re
 
 
 auth = tw.OAuthHandler('consumer_key','consumer_secret') #insert consumer_key and consumer_secret
 auth.set_access_token('access_token','access_token_secret') #insert access_token and access_token_secret
 
 api = tw.API(auth, wait_on_rate_limit=True)
+
+def url_expander(url):
+    session = requests.Session()
+    resp = session.head(url, allow_redirects=True)
+    expanded_url=resp.url
+    return expanded_url 
 
 thread_url=input("Please enter the tweetstorm you want to download: ")
 thread_start_id=thread_url.split('/status/')[1]
@@ -18,9 +24,6 @@ else:
 
 #thread_end_date = datetime.datetime(thread_start_date.year,thread_start_date.month,thread_start_date.day+2,23,59,59) #assumption - almost all people will tweet a tweestorm over three days
 username=thread_url.split('/status/')[0].split('/')[3]
-#status=api.get_status(thread_start_id, tweet_mode='extended')
-#print("user",username,"id",thread_start_id,"start date",thread_start_status.created_at,"end date",thread_end_date)
-#print(thread_start_status.created_at.date())
 tweets_longlist,tweets_shortlist = [],[]
 tweets_shortlist.append(thread_start_status)
 #print(tweets_shortlist)
@@ -51,10 +54,18 @@ for tweet in tweets_longlist:
         tweets_shortlist.append(tweet)
         previous_tweet_id=tweet._json['id']
 
+
 print(f"Tweetstorm by @{username} comprising of {len(tweets_shortlist)} tweets, URL: {thread_url}\n")
 print("-------------------------------------------------------------------------------------------------------------------------------------")
-for tweet in tweets_shortlist:    
-    print(tweet.full_text)
+for tweet in tweets_shortlist:
+    text = tweet.full_text
+    #print(old_text)
+    old_url = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\), ]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', text)
+    if old_url:
+        old_url=old_url[0]
+        new_url = url_expander(old_url) 
+        text =  tweet.full_text.replace(old_url,new_url)
+    print(text)
     if 'media' in tweet.entities: #print urls for images from the tweets
         for media in tweet.extended_entities['media']:
             print(media['media_url'])
